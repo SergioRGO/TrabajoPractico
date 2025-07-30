@@ -49,6 +49,19 @@ void ordenarListaPorCodigoDeProducto(Lista& lista) {
 		}
 	}
 }
+
+void ordenarPorCodigoDeProducto(Ranking& ranking) {
+	for (int i = 0; i < ranking.len_ranking - 1; i++) {
+		for (int j = 0; j < ranking.len_ranking - i - 1; j++) {
+			if (ranking.codigo[j] > ranking.codigo[j + 1]) {
+				int temp = ranking.codigo[j];
+				ranking.codigo[j] = ranking.codigo[j + 1];
+				ranking.codigo[j + 1] = temp;
+			}
+		}
+	}
+}
+
 /*
 void ordenarListaPorSucursal(Lista& lista) {
 
@@ -99,7 +112,7 @@ void dameVentas(Lista& lista) {
 		fclose(archivoVentas);
 	}
 }
-int buscarSec(Lista lista, int valor) {
+int buscarIdVendedor(Lista lista, int valor) {
 	int i = 0;
 	while (i < lista.len_vendedores && lista.vendedores[i].codigo != valor) {
 		i++;
@@ -125,7 +138,6 @@ void vendedorMasDineroGenerado(Lista& lista) {
 	int a = 0;
 	int vendedorMaximo = lista.ventas[0].codigo_vendedor;
 	int ventaMaxima = 0;
-	//Corte de control
 
 	while (a < lista.len_ventas) {
 		int vendedor_actual = lista.ventas[a].codigo_vendedor;
@@ -139,24 +151,20 @@ void vendedorMasDineroGenerado(Lista& lista) {
 			vendedorMaximo = vendedor_actual;
 		}
 	}
-	cout << "El vendedor que mas dinero genero es " << mostrarChars(lista.vendedores[buscarSec(lista, vendedorMaximo)].nombre) << " con un total de: $" << ventaMaxima << " generados" << endl;
+	cout << endl << "---El vendedor que mas dinero genero es ---" << endl<<endl;
+	cout << "  -> " << mostrarChars(lista.vendedores[buscarIdVendedor(lista, vendedorMaximo)].nombre) << " con un total de: $" << ventaMaxima << " generados !!!" << endl;
 }
 
 void sucursalMasDineroGenerado(Lista& lista) {
 
-	/*
-	for (int i = 0; i < lista.len_ventas; i++) {
-		string sucursal=lista.vendedores[buscarSec(lista, lista.ventas[i].codigo_vendedor)].sucursal;
-	}
-	*/
 	string sucursalMaxima = "";
 	float ventaMaxima = 0;
 	int a = 0;
 	
 	while (a < lista.len_ventas) {
-		string sucursalActual = lista.vendedores[buscarSec(lista, lista.ventas[a].codigo_vendedor)].sucursal;
+		string sucursalActual = lista.vendedores[buscarIdVendedor(lista, lista.ventas[a].codigo_vendedor)].sucursal;
 		float sumaVentas = 0;
-		while (a < lista.len_ventas && lista.vendedores[buscarSec(lista, lista.ventas[a].codigo_vendedor)].sucursal==sucursalActual) {
+		while (a < lista.len_ventas && lista.vendedores[buscarIdVendedor(lista, lista.ventas[a].codigo_vendedor)].sucursal==sucursalActual) {
 			sumaVentas += lista.ventas[a].monto_venta;
 			a++;
 		}
@@ -165,18 +173,8 @@ void sucursalMasDineroGenerado(Lista& lista) {
 			sucursalMaxima = sucursalActual;
 		}
 	}
-	cout << "La sucursal que mas genero es: " << sucursalMaxima << " que genero: $" << ventaMaxima << endl;
-}
-void ordenarPorCodigoDeProducto(Ranking& ranking) {
-	for (int i = 0; i < ranking.len_ranking - 1; i++) {
-		for (int j = 0; j < ranking.len_ranking - i - 1; j++) {
-			if (ranking.codigo[j] > ranking.codigo[j + 1]) {
-				int temp = ranking.codigo[j];
-				ranking.codigo[j] = ranking.codigo[j + 1];
-				ranking.codigo[j + 1] = temp;
-			}
-		}
-	}
+	cout << endl << "---La sucursal que mas dinero genero es ---" << endl<<endl;
+	cout << "  -> " << sucursalMaxima << " que genero: $" << ventaMaxima <<" !!!"<< endl;
 }
 
 void rankingDeProductos(Lista lista) {
@@ -199,29 +197,30 @@ void rankingDeProductos(Lista lista) {
 		ranking.len_ranking = i;
 	}
 	ordenarPorCodigoDeProducto(ranking);
+	cout << endl << " ***Ranking de Productos***" << endl<<endl;
+	cout << "--------------------------------" << endl;
 	for (int i = 0; i < ranking.len_ranking; i++) {
-		cout << "---------------------" << endl;
-		cout << "codigo de producto: " << ranking.codigo[i] << endl;
-		cout << "se vendio: " << ranking.contador[i] << endl;
+		cout << "  Codigo de producto: " << ranking.codigo[i] << endl;
+		cout << "  Se vendio: " << ranking.contador[i] << endl;
+		cout << "--------------------------------" << endl;
 	}
-	
 }
 
 // Mostrares
-void mostrarArchivo() {
+void mostrarVendedores() {
 	FILE* arch;
 	fopen_s(&arch, "Vendedores.dat", "rb");
 	if (!arch) {
-		cout << "Archivo vacio o no encontrado." << endl;
+		cout << " Archivo vacio o no encontrado." << endl;
 		return;
 	}
 
 	Vendedor v;
 	while (fread(&v, sizeof(Vendedor), 1, arch)) {
-		cout << "Codigo: " << v.codigo << endl;
-		cout << "Nombre: " << v.nombre << endl;
-		cout << "Sucursal: " << v.sucursal << endl;
-		cout << "-----------------------------" << endl;
+		cout << " Codigo: " << v.codigo << endl;
+		cout << " Nombre: " << v.nombre << endl;
+		cout << " Sucursal: " << v.sucursal << endl;
+		cout << " -----------------------------" << endl;
 	}
 
 	fclose(arch);
@@ -231,42 +230,21 @@ void mostrarVentas() {
 	FILE* arch;
 	fopen_s(&arch, "ventas_diarias.dat", "rb");
 	if (!arch) {
-		cout << "Archivo de ventas vacio o no encontrado." << endl;
+		cout << " Archivo de ventas vacio o no encontrado." << endl;
 		return;
 	}
 	Venta v;
 	cout << "\nVentas registradas:\n";
 	while (fread(&v, sizeof(Venta), 1, arch)) {
-		cout << "Fecha: " << v.fecha << endl;
-		cout << "Vendedor: " << v.codigo_vendedor << endl;
-		cout << "Producto: " << v.codigo_producto << endl;
-		cout << "Monto: $" << v.monto_venta << endl;
-		cout << "-----------------------------" << endl;
+		cout << " Fecha: " << v.fecha << endl;
+		cout << " Vendedor: " << v.codigo_vendedor << endl;
+		cout << " Producto: " << v.codigo_producto << endl;
+		cout << " Monto: $" << v.monto_venta << endl;
+		cout << " -----------------------------" << endl;
 	}
 	fclose(arch);
 }
 
-void mostrarVentas(Lista lista) {
-
-	cout << "\nVentas registradas:\n";
-	for (int i=0; i < lista.len_ventas;i++) {
-		cout << "Fecha: " << lista.ventas[i].fecha << endl;
-		cout << "Vendedor: " << lista.ventas[i].codigo_vendedor << endl;
-		cout << "Producto: " << lista.ventas[i].codigo_producto << endl;
-		cout << "Monto: $" << lista.ventas[i].monto_venta << endl;
-		cout << "-----------------------------" << endl;
-	}
-}
-
-void mostrarArchivo(Lista lista) {
-
-	for (int i = 0; i < lista.len_vendedores; i++) {
-		cout << "Codigo: " << lista.vendedores[i].codigo << endl;
-		cout << "Nombre: " << lista.vendedores[i].nombre << endl;
-		cout << "Sucursal: " << lista.vendedores[i].sucursal << endl;
-		cout << "-----------------------------" << endl;
-	}
-}
 int main() {
 
 
@@ -282,8 +260,8 @@ int main() {
 	//Array de vendedores
 
 	Lista lista;
-	mostrarArchivo();
-	mostrarVentas();
+	//mostrarVendedores();
+	//mostrarVentas();
 	dameVendedores(lista);
 	dameVentas(lista);
 	ordenarListaPorCodigo(lista);
