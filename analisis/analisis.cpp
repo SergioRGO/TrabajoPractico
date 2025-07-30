@@ -3,6 +3,7 @@
 using namespace std;
 
 struct Venta {
+	int fecha;
 	int codigo_vendedor;
 	int codigo_producto;
 	float monto_venta;
@@ -14,11 +15,11 @@ struct Vendedor {
 	char sucursal[50];
 };
 
-struct Lista{
+struct Lista {
 	Venta ventas[1000];
-	int len_ventas=0;
+	int len_ventas = 0;
 	Vendedor vendedores[100];
-	int len_vendedores=0;
+	int len_vendedores = 0;
 };
 
 void ordenarListaPorCodigo(Lista& lista) {
@@ -31,32 +32,36 @@ void ordenarListaPorCodigo(Lista& lista) {
 			}
 		}
 	}
-	for (int i = 0; i < lista.len_vendedores; i++) {
-		for (int j = 0; i < lista.len_vendedores - 1; j++) {
-			if (lista.vendedores[j].codigo > lista.vendedores[j + 1].codigo) {
-				Vendedor temp = lista.vendedores[j];
-				lista.vendedores[j] = lista.vendedores[j + 1];
-				lista.vendedores[j + 1] = temp;
-			}
-		}
-	}
 }
 void ordenarListaPorSucursal(Lista& lista) {
-	for (int i = 0; i < lista.len_vendedores; i++) {
+
+	for (int i = 0; i < lista.len_vendedores-1; i++) {
+		for(int j=i+1;j<lista.len_vendedores;j++)
+			if (strcmp(lista.vendedores[i].sucursal , lista.vendedores[j].sucursal)==0) {
+				Vendedor temp = lista.vendedores[j];
+				lista.vendedores[j] = lista.vendedores[i + 1];
+				lista.vendedores[i+1] = temp;
+				continue;
+			}
+	}
+	/* 
+		for (int i = 0; i < lista.len_vendedores; i++) {
+		cout << lista.len_vendedores<<endl;
 		for (int j = 0; i < lista.len_vendedores - 1; j++) {
-			if (lista.vendedores[j].sucursal > lista.vendedores[j + 1].sucursal) {
+			if (strcmp(lista.vendedores[j].sucursal,lista.vendedores[j + 1].sucursal)==0) {
 				Vendedor temp = lista.vendedores[j];
 				lista.vendedores[j] = lista.vendedores[j + 1];
 				lista.vendedores[j + 1] = temp;
 			}
 		}
-	}
+	}*/
 }
+	
 
 void dameVendedores(Lista& lista) {
 	Vendedor vendedorGuardado;
 	FILE* archivoVendedores;
-	fopen_s(&archivoVendedores, "vendedores.dat", "rb");
+	fopen_s(&archivoVendedores, "Vendedores.dat", "rb");
 	if (archivoVendedores != NULL) {
 		while (fread(&vendedorGuardado, sizeof(Vendedor), 1, archivoVendedores) == 1) {
 			lista.vendedores[lista.len_vendedores] = vendedorGuardado;
@@ -68,7 +73,7 @@ void dameVendedores(Lista& lista) {
 void dameVentas(Lista& lista) {
 	Venta VentaGuardada;
 	FILE* archivoVentas;
-	fopen_s(&archivoVentas, "ventas.dat", "rb");
+	fopen_s(&archivoVentas, "ventas_diarias.dat", "rb");
 	if (archivoVentas != NULL) {
 		while (fread(&VentaGuardada, sizeof(Venta), 1, archivoVentas) == 1) {
 			lista.ventas[lista.len_ventas] = VentaGuardada;
@@ -77,90 +82,152 @@ void dameVentas(Lista& lista) {
 		fclose(archivoVentas);
 	}
 }
+int buscarSec(Lista lista, int valor) {
+	int i = 0;
+	while (i < lista.len_vendedores && lista.vendedores[i].codigo != valor) {
+		i++;
+	}
+	if (i == lista.len_vendedores) {
+		return -1;
+	}
+	else {
+		return i;
+	}
+}
+string mostrarChars(char nombre[]) {
+	int i = 0;
+	string devolver = "";
+	while (nombre[i] != '\0') {
+		devolver += nombre[i];
+		i++;
+	}
+	return devolver;
+}
+void vendedorMasDineroGenerado(Lista& lista) {
 
-void vendedorMasDineroGenerado(Lista& lista){
-	
-	//Vendedor masVentas;
 	int a = 0;
-	int vendedorMaximo=lista.ventas[0].codigo_vendedor;
-	int ventaMaxima=0;
+	int vendedorMaximo = lista.ventas[0].codigo_vendedor;
+	int ventaMaxima = 0;
 	//Corte de control
+
 	while (a < lista.len_ventas) {
 		int vendedor_actual = lista.ventas[a].codigo_vendedor;
 		int sumaVentas = 0;
-		while (a < lista.len_ventas && lista.ventas[a].codigo_producto == vendedor_actual) {
-			a++;
+		while (a < lista.len_ventas && lista.ventas[a].codigo_vendedor == vendedor_actual) {
 			sumaVentas += lista.ventas[a].monto_venta;
+			a++;
 		}
 		if (sumaVentas > ventaMaxima) {
 			ventaMaxima = sumaVentas;
 			vendedorMaximo = vendedor_actual;
 		}
 	}
-	cout << "El vendedor que mas dinero generó es " << lista.vendedores[busquedaBinaria(lista, vendedorMaximo)].nombre << " con un total de: $" << ventaMaxima << " generados" << endl;
+	cout << "El vendedor que mas dinero genero es " << mostrarChars(lista.vendedores[buscarSec(lista, vendedorMaximo)].nombre) << " con un total de: $" << ventaMaxima << " generados" << endl;
 }
 
-void  sucursalMasDineroGenerado(Lista lista) {
-	Vendedor masVentas;
+void sucursalMasDineroGenerado(Lista& lista) {
 	int a = 0;
+	string sucursalMaxima = mostrarChars(lista.vendedores[0].sucursal);
 	int ventaMaxima = 0;
-
-
-}
-void copiarSucursal(Vendedor& vendedor,Vendedor asignar) {
-	while (asignar.sucursal != '\0') {
-
-	}
-	for (int i = 0; i < 50; ++i) {
-		vendedor.sucursal[i] = asignar.sucursal[i];
-		if (asignar.sucursal[i] == '\0') break;
-	}
-
-}
-
-int busquedaBinaria(Lista lista, int valor) {
-	int izquierda = 0;
-	int derecha = lista.len_vendedores - 1;
-	while (izquierda <= derecha) {
-		int medio = (izquierda + derecha) / 2;
-		if (lista.vendedores[medio].codigo == valor) {
-			return medio;
+	//Corte de control
+	while (a < lista.len_vendedores) {
+		int sucursal_actual = lista.ventas[a].codigo_vendedor;
+		int sumaVentas = 0;
+		while (a < lista.len_ventas && lista.ventas[a].codigo_vendedor == vendedor_actual) {
+			sumaVentas += lista.ventas[a].monto_venta;
+			a++;
 		}
-		else if (lista.vendedores[medio].codigo < valor) {
-			izquierda = medio + 1;
-		}
-		else {
-			derecha = medio - 1;
+		if (sumaVentas > ventaMaxima) {
+			ventaMaxima = sumaVentas;
+			vendedorMaximo = vendedor_actual;
 		}
 	}
-	return -1;
+	cout << "El vendedor que mas dinero genero es " << mostrarChars(lista.vendedores[buscarSec(lista, vendedorMaximo)].nombre) << " con un total de: $" << ventaMaxima << " generados" << endl;
+}
 }
 
-void mostrar(char nombre[], int cant) {
-	cant = 0;
+// Mostrares
+void mostrarArchivo() {
+	FILE* arch;
+	fopen_s(&arch, "Vendedores.dat", "rb");
+	if (!arch) {
+		cout << "Archivo vacio o no encontrado." << endl;
+		return;
+	}
+
+	Vendedor v;
+	while (fread(&v, sizeof(Vendedor), 1, arch)) {
+		cout << "Codigo: " << v.codigo << endl;
+		cout << "Nombre: " << v.nombre << endl;
+		cout << "Sucursal: " << v.sucursal << endl;
+		cout << "-----------------------------" << endl;
+	}
+
+	fclose(arch);
 }
 
+void mostrarVentas() {
+	FILE* arch;
+	fopen_s(&arch, "ventas_diarias.dat", "rb");
+	if (!arch) {
+		cout << "Archivo de ventas vacio o no encontrado." << endl;
+		return;
+	}
+	Venta v;
+	cout << "\nVentas registradas:\n";
+	while (fread(&v, sizeof(Venta), 1, arch)) {
+		cout << "Fecha: " << v.fecha << endl;
+		cout << "Vendedor: " << v.codigo_vendedor << endl;
+		cout << "Producto: " << v.codigo_producto << endl;
+		cout << "Monto: $" << v.monto_venta << endl;
+		cout << "-----------------------------" << endl;
+	}
+	fclose(arch);
+}
+
+void mostrarVentas(Lista lista) {
+
+	cout << "\nVentas registradas:\n";
+	for (int i=0; i < lista.len_ventas;i++) {
+		cout << "Fecha: " << lista.ventas[i].fecha << endl;
+		cout << "Vendedor: " << lista.ventas[i].codigo_vendedor << endl;
+		cout << "Producto: " << lista.ventas[i].codigo_producto << endl;
+		cout << "Monto: $" << lista.ventas[i].monto_venta << endl;
+		cout << "-----------------------------" << endl;
+	}
+}
+
+void mostrarArchivo(Lista lista) {
+
+	for (int i = 0; i < lista.len_vendedores; i++) {
+		cout << "Codigo: " << lista.vendedores[i].codigo << endl;
+		cout << "Nombre: " << lista.vendedores[i].nombre << endl;
+		cout << "Sucursal: " << lista.vendedores[i].sucursal << endl;
+		cout << "-----------------------------" << endl;
+	}
+}
 int main() {
-	
 
-	/* 
-	- Determinar **el vendedor que más dinero generó** (mostrar su nombre y monto total).
-	- Determinar **la sucursal que más dinero generó** (sumando las ventas de todos los vendedores de esa sucursal).
-	- Mostrar **un ranking de los productos más vendidos** (por cantidad de veces que se vendió cada código de producto).
-	
-	- Agrupar ventas por vendedor y sucursal usando **corte de control** o acumulación.
+
+	/*
+	- Determinar **el vendedor que mÃ¡s dinero generÃ³** (mostrar su nombre y monto total).
+	- Determinar **la sucursal que mÃ¡s dinero generÃ³** (sumando las ventas de todos los vendedores de esa sucursal).
+	- Mostrar **un ranking de los productos mÃ¡s vendidos** (por cantidad de veces que se vendiÃ³ cada cÃ³digo de producto).
+
+	- Agrupar ventas por vendedor y sucursal usando **corte de control** o acumulaciÃ³n.
 	- Para ranking de productos, contar ocurrencias y luego ordenar.
 	*/
 
 	//Array de vendedores
 
 	Lista lista;
-	
+	mostrarArchivo();
+	mostrarVentas();
 	dameVendedores(lista);
 	dameVentas(lista);
 	ordenarListaPorCodigo(lista);
 	vendedorMasDineroGenerado(lista);
 	ordenarListaPorSucursal(lista);
-	sucursalMasDineroGenerado(lista);
+	mostrarArchivo(lista);
 	return 0;
 }
