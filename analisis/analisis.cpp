@@ -21,6 +21,11 @@ struct Lista {
 	Vendedor vendedores[100];
 	int len_vendedores = 0;
 };
+struct Ranking {
+	int codigo[1000];
+	int contador[1000];
+	int len_ranking;
+};
 
 void ordenarListaPorCodigo(Lista& lista) {
 	for (int i = 0; i < lista.len_ventas - 1; i++) {
@@ -33,6 +38,18 @@ void ordenarListaPorCodigo(Lista& lista) {
 		}
 	}
 }
+void ordenarListaPorCodigoDeProducto(Lista& lista) {
+	for (int i = 0; i < lista.len_ventas - 1; i++) {
+		for (int j = 0; j < lista.len_ventas - i - 1; j++) {
+			if (lista.ventas[j].codigo_producto > lista.ventas[j + 1].codigo_producto) {
+				Venta temp = lista.ventas[j];
+				lista.ventas[j] = lista.ventas[j + 1];
+				lista.ventas[j + 1] = temp;
+			}
+		}
+	}
+}
+/*
 void ordenarListaPorSucursal(Lista& lista) {
 
 	for (int i = 0; i < lista.len_vendedores-1; i++) {
@@ -44,7 +61,7 @@ void ordenarListaPorSucursal(Lista& lista) {
 				continue;
 			}
 	}
-	/* 
+	 
 		for (int i = 0; i < lista.len_vendedores; i++) {
 		cout << lista.len_vendedores<<endl;
 		for (int j = 0; i < lista.len_vendedores - 1; j++) {
@@ -54,9 +71,9 @@ void ordenarListaPorSucursal(Lista& lista) {
 				lista.vendedores[j + 1] = temp;
 			}
 		}
-	}*/
+	}
 }
-	
+*/	
 
 void dameVendedores(Lista& lista) {
 	Vendedor vendedorGuardado;
@@ -112,7 +129,7 @@ void vendedorMasDineroGenerado(Lista& lista) {
 
 	while (a < lista.len_ventas) {
 		int vendedor_actual = lista.ventas[a].codigo_vendedor;
-		int sumaVentas = 0;
+		float sumaVentas = 0;
 		while (a < lista.len_ventas && lista.ventas[a].codigo_vendedor == vendedor_actual) {
 			sumaVentas += lista.ventas[a].monto_venta;
 			a++;
@@ -126,24 +143,68 @@ void vendedorMasDineroGenerado(Lista& lista) {
 }
 
 void sucursalMasDineroGenerado(Lista& lista) {
+
+	/*
+	for (int i = 0; i < lista.len_ventas; i++) {
+		string sucursal=lista.vendedores[buscarSec(lista, lista.ventas[i].codigo_vendedor)].sucursal;
+	}
+	*/
+	string sucursalMaxima = "";
+	float ventaMaxima = 0;
 	int a = 0;
-	string sucursalMaxima = mostrarChars(lista.vendedores[0].sucursal);
-	int ventaMaxima = 0;
-	//Corte de control
-	while (a < lista.len_vendedores) {
-		int sucursal_actual = lista.ventas[a].codigo_vendedor;
-		int sumaVentas = 0;
-		while (a < lista.len_ventas && lista.ventas[a].codigo_vendedor == vendedor_actual) {
+	
+	while (a < lista.len_ventas) {
+		string sucursalActual = lista.vendedores[buscarSec(lista, lista.ventas[a].codigo_vendedor)].sucursal;
+		float sumaVentas = 0;
+		while (a < lista.len_ventas && lista.vendedores[buscarSec(lista, lista.ventas[a].codigo_vendedor)].sucursal==sucursalActual) {
 			sumaVentas += lista.ventas[a].monto_venta;
 			a++;
 		}
 		if (sumaVentas > ventaMaxima) {
 			ventaMaxima = sumaVentas;
-			vendedorMaximo = vendedor_actual;
+			sucursalMaxima = sucursalActual;
 		}
 	}
-	cout << "El vendedor que mas dinero genero es " << mostrarChars(lista.vendedores[buscarSec(lista, vendedorMaximo)].nombre) << " con un total de: $" << ventaMaxima << " generados" << endl;
+	cout << "La sucursal que mas genero es: " << sucursalMaxima << " que genero: $" << ventaMaxima << endl;
 }
+void ordenarPorCodigoDeProducto(Ranking& ranking) {
+	for (int i = 0; i < ranking.len_ranking - 1; i++) {
+		for (int j = 0; j < ranking.len_ranking - i - 1; j++) {
+			if (ranking.codigo[j] > ranking.codigo[j + 1]) {
+				int temp = ranking.codigo[j];
+				ranking.codigo[j] = ranking.codigo[j + 1];
+				ranking.codigo[j + 1] = temp;
+			}
+		}
+	}
+}
+
+void rankingDeProductos(Lista lista) {
+
+	int a = 0;
+	int i = 0;
+	Ranking ranking;
+
+	while (a < lista.len_ventas) {
+		int producto_actual = lista.ventas[a].codigo_producto;
+		float sumaVentas = 0;
+		int contador = 0;
+		while (a < lista.len_ventas && lista.ventas[a].codigo_producto == producto_actual) {
+			contador++;
+			a++;
+		}
+		ranking.codigo[i] = producto_actual;
+		ranking.contador[i] = contador;
+		i++;
+		ranking.len_ranking = i;
+	}
+	ordenarPorCodigoDeProducto(ranking);
+	for (int i = 0; i < ranking.len_ranking; i++) {
+		cout << "---------------------" << endl;
+		cout << "codigo de producto: " << ranking.codigo[i] << endl;
+		cout << "se vendio: " << ranking.contador[i] << endl;
+	}
+	
 }
 
 // Mostrares
@@ -227,7 +288,8 @@ int main() {
 	dameVentas(lista);
 	ordenarListaPorCodigo(lista);
 	vendedorMasDineroGenerado(lista);
-	ordenarListaPorSucursal(lista);
-	mostrarArchivo(lista);
+	sucursalMasDineroGenerado(lista);
+	ordenarListaPorCodigoDeProducto(lista);
+	rankingDeProductos(lista);
 	return 0;
 }
