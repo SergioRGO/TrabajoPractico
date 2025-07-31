@@ -62,17 +62,22 @@ bool vendedorExiste(int codigoext, Vendedor vec[], int len) {
 	return false;
 }
 void cargarVentas() {
+
 	Venta ventas[MAX_VENTAS];
 	int lenVentas = 0;
 	Vendedor vendedores[MAX_VENDEDORES];
 	int lenVendedores = 0;
+
 	cargarVendedores(vendedores, lenVendedores);
+
 	if (lenVendedores == 0) {
 		cout << "No hay vendedores registrados. No se puede cargar ventas."
 			<< endl;
 		return;
 	}
+
 	char seguir='s';
+
 	do {
 		if (lenVentas >= MAX_VENTAS) {
 			cout << "Se alcanzo el limite maximo de ventas diarias." << endl;

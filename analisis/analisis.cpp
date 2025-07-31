@@ -1,3 +1,12 @@
+/*
+	- Determinar **el vendedor que más dinero generó** (mostrar su nombre y monto total).
+	- Determinar **la sucursal que más dinero generó** (sumando las ventas de todos los vendedores de esa sucursal).
+	- Mostrar **un ranking de los productos más vendidos** (por cantidad de veces que se vendió cada código de producto).
+
+	- Agrupar ventas por vendedor y sucursal usando **corte de control** o acumulación.
+	- Para ranking de productos, contar ocurrencias y luego ordenar.
+*/
+
 #include <iostream>
 #define _CRT_SECURE_NO_WARNINGS
 using namespace std;
@@ -53,10 +62,13 @@ void ordenarListaPorCodigoDeProducto(Lista& lista) {
 void ordenarPorCodigoDeProducto(Ranking& ranking) {
 	for (int i = 0; i < ranking.len_ranking - 1; i++) {
 		for (int j = 0; j < ranking.len_ranking - i - 1; j++) {
-			if (ranking.codigo[j] > ranking.codigo[j + 1]) {
+			if (ranking.contador[j] < ranking.contador[j + 1]) {
 				int temp = ranking.codigo[j];
+				float temp2 = ranking.contador[j];
 				ranking.codigo[j] = ranking.codigo[j + 1];
 				ranking.codigo[j + 1] = temp;
+				ranking.contador[j] = ranking.contador[j + 1];
+				ranking.contador[j + 1] = temp2;
 			}
 		}
 	}
@@ -246,18 +258,6 @@ void mostrarVentas() {
 }
 
 int main() {
-
-
-	/*
-	- Determinar **el vendedor que más dinero generó** (mostrar su nombre y monto total).
-	- Determinar **la sucursal que más dinero generó** (sumando las ventas de todos los vendedores de esa sucursal).
-	- Mostrar **un ranking de los productos más vendidos** (por cantidad de veces que se vendió cada código de producto).
-
-	- Agrupar ventas por vendedor y sucursal usando **corte de control** o acumulación.
-	- Para ranking de productos, contar ocurrencias y luego ordenar.
-	*/
-
-	//Array de vendedores
 
 	Lista lista;
 	//mostrarVendedores();
